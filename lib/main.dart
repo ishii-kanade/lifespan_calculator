@@ -20,22 +20,22 @@ class AgeInput extends StatefulWidget {
 }
 
 class _AgeInputState extends State<AgeInput> {
-  final TextEditingController _controller = TextEditingController();
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  DateTime? _birthDate;
   String _message = '';
 
   void calculateAge() {
-    final birthDate = DateTime.parse(_controller.text);
-    final currentDate = DateTime.now();
-    int years = currentDate.year - birthDate.year;
-    if (birthDate.month > currentDate.month ||
-        (birthDate.month == currentDate.month && birthDate.day > currentDate.day)) {
-      years--;
+    if(_birthDate != null){
+      final currentDate = DateTime.now();
+      int years = currentDate.year - _birthDate!.year;
+      if (_birthDate!.month > currentDate.month ||
+          (_birthDate!.month == currentDate.month && _birthDate!.day > currentDate.day)) {
+        years--;
+      }
+      final remainingYears = 80 - years; // Assume average lifespan is 80 years
+      setState(() {
+        _message = 'You have approximately $remainingYears years left.';
+      });
     }
-    final remainingYears = 80 - years; // Assume average lifespan is 80 years
-    setState(() {
-      _message = 'You have approximately $remainingYears years left.';
-    });
   }
 
   @override
@@ -47,21 +47,37 @@ class _AgeInputState extends State<AgeInput> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'Enter your birth date',
-                hintText: 'yyyy-MM-dd',
-              ),
+          Center(
+            child: Text(
+              _birthDate == null ? 'Enter your birth date' : 'Birth date: ${DateFormat('yyyy-MM-dd').format(_birthDate!)}',
+              style: TextStyle(fontSize: 16.0),
             ),
           ),
-          ElevatedButton(
-            onPressed: calculateAge,
-            child: Text('Calculate remaining years'),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: _birthDate == null ? DateTime.now() : _birthDate!,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null && picked != _birthDate) {
+                  setState(() {
+                    _birthDate = picked;
+                  });
+                }
+              },
+              child: Text('Select birth date'),
+            ),
           ),
-          Text(_message),
+          Center(
+            child: ElevatedButton(
+              onPressed: calculateAge,
+              child: Text('Calculate remaining years'),
+            ),
+          ),
+          Center(child: Text(_message)),
         ],
       ),
     );
