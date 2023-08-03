@@ -2,27 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'age_calculator_viewmodel.dart';
 
-Widget birthDateDisplay(BuildContext context) {
-  final viewModel = Provider.of<AgeCalculatorViewModel>(context);
-  return Center(
-    child: Text(
-      viewModel.birthDate == null
-          ? 'Enter your birth date'
-          : 'Birth date: ${viewModel.birthDate!.toLocal()}'.split(' ')[0],
-      style: const TextStyle(fontSize: 16.0),
-    ),
-  );
-}
-
-Widget selectBirthDateButton(BuildContext context) {
-  return Center(
-    child: ElevatedButton(
-      onPressed: () => selectBirthDate(context),
-      child: const Text('Select birth date'),
-    ),
-  );
-}
-
 Future<void> selectBirthDate(BuildContext context) async {
   final viewModel = Provider.of<AgeCalculatorViewModel>(context, listen: false);
   final DateTime? picked = await showDatePicker(
@@ -35,28 +14,6 @@ Future<void> selectBirthDate(BuildContext context) async {
   if (picked != null) {
     viewModel.setBirthDate(picked);
   }
-}
-
-Widget calculateButton(BuildContext context) {
-  return Center(
-    child: ElevatedButton(
-      onPressed: () {
-        final viewModel =
-        Provider.of<AgeCalculatorViewModel>(context, listen: false);
-        final result = calculateRemainingLife(viewModel.birthDate);
-        if (result != null) {
-          viewModel.setMessage(
-              'You have approximately ${result['years']} years, ${result['months']} months, and ${result['days']} days left.');
-        }
-      },
-      child: const Text('Calculate remaining years'),
-    ),
-  );
-}
-
-Widget messageDisplay(BuildContext context) {
-  final viewModel = Provider.of<AgeCalculatorViewModel>(context);
-  return Center(child: Text(viewModel.message));
 }
 
 Map<String, int>? calculateRemainingLife(DateTime? birthDate) {
