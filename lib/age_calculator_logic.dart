@@ -1,4 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'age_calculator_viewmodel.dart';
+
+Widget birthDateDisplay(BuildContext context) {
+  final viewModel = Provider.of<AgeCalculatorViewModel>(context);
+  return Center(
+    child: Text(
+      viewModel.birthDate == null
+          ? 'Enter your birth date'
+          : 'Birth date: ${viewModel.birthDate!.toLocal()}'.split(' ')[0],
+      style: const TextStyle(fontSize: 16.0),
+    ),
+  );
+}
+
+Widget selectBirthDateButton(BuildContext context) {
+  return Center(
+    child: ElevatedButton(
+      onPressed: () => selectBirthDate(context),
+      child: const Text('Select birth date'),
+    ),
+  );
+}
+
+Future<void> selectBirthDate(BuildContext context) async {
+  final viewModel = Provider.of<AgeCalculatorViewModel>(context, listen: false);
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(1900),
+    lastDate: DateTime.now(),
+  );
+
+  if (picked != null) {
+    viewModel.setBirthDate(picked);
+  }
+}
+
+Widget calculateButton(BuildContext context) {
+  return Center(
+    child: ElevatedButton(
+      onPressed: () {
+        final viewModel =
+        Provider.of<AgeCalculatorViewModel>(context, listen: false);
+        final result = calculateRemainingLife(viewModel.birthDate);
+        if (result != null) {
+          viewModel.setMessage(
+              'You have approximately ${result['years']} years, ${result['months']} months, and ${result['days']} days left.');
+        }
+      },
+      child: const Text('Calculate remaining years'),
+    ),
+  );
+}
+
+Widget messageDisplay(BuildContext context) {
+  final viewModel = Provider.of<AgeCalculatorViewModel>(context);
+  return Center(child: Text(viewModel.message));
+}
 
 Map<String, int>? calculateRemainingLife(DateTime? birthDate) {
   if (birthDate != null) {
@@ -21,44 +80,11 @@ Map<String, int>? calculateRemainingLife(DateTime? birthDate) {
     final remainingMonths = 12 - months; // Remaining months in current year
     final remainingDays = 30 - days; // Remaining days in current month
 
-    return {'years': remainingYears, 'months': remainingMonths, 'days': remainingDays};
+    return {
+      'years': remainingYears,
+      'months': remainingMonths,
+      'days': remainingDays,
+    };
   }
   return null;
-}
-
-Widget birthDateDisplay(DateTime? birthDate) {
-  return Center(
-    child: Text(
-      birthDate == null ? 'Enter your birth date' : 'Birth date: ${birthDate.toLocal()}'.split(' ')[0],
-      style: const TextStyle(fontSize: 16.0),
-    ),
-  );
-}
-
-Widget selectBirthDateButton(BuildContext context, Function(DateTime) onPicked) {
-  return Center(
-    child: ElevatedButton(
-      onPressed: () async {
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (picked != null) {
-          onPicked(picked);
-        }
-      },
-      child: const Text('Select birth date'),
-    ),
-  );
-}
-
-Widget calculateButton(VoidCallback onPressed) {
-  return Center(
-    child: ElevatedButton(
-      onPressed: onPressed,
-      child: const Text('Calculate remaining years'),
-    ),
-  );
 }
