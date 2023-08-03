@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 void main() {
-  runApp(AgeCalculator());
+  runApp(const AgeCalculator());
 }
 
 class AgeCalculator extends StatelessWidget {
+  const AgeCalculator({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: AgeInput(),
     );
   }
 }
 
 class AgeInput extends StatefulWidget {
+  const AgeInput({super.key});
+
   @override
   _AgeInputState createState() => _AgeInputState();
 }
@@ -42,7 +46,7 @@ class _AgeInputState extends State<AgeInput> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lifespan Calculator'),
+        title: const Text('Lifespan Calculator'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +54,7 @@ class _AgeInputState extends State<AgeInput> {
           Center(
             child: Text(
               _birthDate == null ? 'Enter your birth date' : 'Birth date: ${DateFormat('yyyy-MM-dd').format(_birthDate!)}',
-              style: TextStyle(fontSize: 16.0),
+              style: const TextStyle(fontSize: 16.0),
             ),
           ),
           Center(
@@ -68,13 +72,13 @@ class _AgeInputState extends State<AgeInput> {
                   });
                 }
               },
-              child: Text('Select birth date'),
+              child: const Text('Select birth date'),
             ),
           ),
           Center(
             child: ElevatedButton(
               onPressed: calculateAge,
-              child: Text('Calculate remaining years'),
+              child: const Text('Calculate remaining years'),
             ),
           ),
           Center(child: Text(_message)),
